@@ -16,8 +16,18 @@ pipeline {
         stage('build') {
             steps {
                 sh 'mvn clean package'
-                archiveArtifacts artifacts: '**/spring-petclinic-*.jar'
-                junit testResults: '**/TEST-*.xml'
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: '**/spring-petclinic-*.jar'
+                    junit testResults: '**/TEST-*.xml'
+                }
+                failure {
+                    mail subject: 'build stage failed'
+                         from: 'devops@gmail.com'
+                         to: 'dev@gmail.com'
+                         body: 'Refer to $BUILD_URL for more info'
+                }
             }
         }
     }
